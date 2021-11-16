@@ -5,6 +5,8 @@ function Kyselylist()
     const [id, setId] = React.useState('');
 
     const [title, setTitle] = React.useState('');
+    const [questions, setQuestions] = React.useState([]);
+    const [qId, setQId] = React.useState('0');
 
     React.useEffect(() => {    
 
@@ -17,9 +19,17 @@ function Kyselylist()
         fetch('https://saerarjojo.herokuapp.com/kysely/' + id)
         .then(response => response.json())
         .then(data => {
-             setTitle(data.title)
+
+            for(let i=0; i < data.kysymykset.length; i++)
+            {
+                setQId(i);
+
+                setTitle(data.title);
+                setQuestions(data.kysymykset[qId].kysymys);
+            }
         })
         .catch(err => console.log(err))
+
     }
 
     function inputChanged (event)
@@ -37,6 +47,9 @@ function Kyselylist()
             </form>
 
             <p>Title: {title}</p>
+            <p>Kysymykset:</p>
+            <p>{questions}</p>
+            
         </div>
     );
 }

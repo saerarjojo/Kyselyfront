@@ -6,8 +6,11 @@ function Kyselylist()
 
     const [title, setTitle] = React.useState('');
 
-    var table = [];
-    var text = "";
+    const [done, setDone] = React.useState(false);
+
+    var questions = [];
+
+    var qSize = 0;
 
     React.useEffect(() => {    
 
@@ -21,16 +24,25 @@ function Kyselylist()
         .then(response => response.json())
         .then(data => {
             
-            for(let i=0; i < data.kysymykset.length; i++)
-            {
-                setTitle(data.title);
-                
-                table += data.kysymykset[String(i)].kysymys;
+            qSize = data.kysymykset.length;
 
-                document.getElementById("demo").innerHTML = table;
+            if(!done)
+            {   
+                setDone(true);
+
+                for(var i=0; i < qSize; i++)
+                {
+                    setTitle(data.title);
+                    
+                    questions[i] = data.kysymykset[i].kysymys;   
+                    
+                    document.getElementById("questions").innerHTML += 
+                    questions[i] + "</br>";
+                }
             }
         })
         .catch(err => console.log(err))
+
     }
 
     return(
@@ -43,7 +55,7 @@ function Kyselylist()
 
             <p>Title: {title}</p>
             <p>Kysymykset:</p>
-            <p id="demo"></p>          
+            <div id="questions"></div>      
         </div>
     );
 }

@@ -9,8 +9,9 @@ function Kyselylist()
     const [done, setDone] = React.useState(false);
 
     var questions = [];
-
     var qSize = 0;
+
+    var answer = [];
 
     React.useEffect(() => {    
 
@@ -18,9 +19,14 @@ function Kyselylist()
 
     }, )
 
+    function sendQuestions()
+    {
+        console.log("sendQuestions");
+    }
+
     function fetchQuestion()
     {
-        fetch('https://saerarjojo.herokuapp.com/kysely/' + id)
+        fetch('https://saerarjojo.herokuapp.com/restkysely/' + id)
         .then(response => response.json())
         .then(data => {
             
@@ -37,8 +43,13 @@ function Kyselylist()
                     questions[i] = data.kysymykset[i].kysymys;   
                     
                     document.getElementById("questions").innerHTML += 
-                    questions[i] + "</br>";
+                    "<form>" +
+                        questions[i] + "</br>" +
+                        "<input type='text'/>";
                 }
+                document.getElementById("questions").innerHTML += 
+                "<button onClick=" + sendQuestions() + "> SEND </button>" +  
+                "</form>";
             }
         })
         .catch(err => console.log(err))

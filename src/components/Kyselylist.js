@@ -11,8 +11,6 @@ function Kyselylist()
     var questions = [];
     var qSize = 0;
 
-    var answer = [];
-
     React.useEffect(() => {    
 
         fetchQuestion();

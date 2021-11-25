@@ -10,6 +10,8 @@ function Kyselylist()
 
     var questions = [];
     var qSize = 0;
+    
+    const [answers, setAnswers] = React.useState([]);
 
     React.useEffect(() => {    
 
@@ -17,14 +19,16 @@ function Kyselylist()
 
     }, )
 
-    function sendQuestions()
+    function sendAnswers()
     {
-        console.log("sendQuestions");
+        console.log("-- sendAnswers");
+
+        console.log("answers: " + answers[0]);
     }
 
     function fetchQuestion()
     {
-        fetch('https://saerarjojo.herokuapp.com/restkysely/' + id)
+        fetch('https://saerarjojo.herokuapp.com/rest/kyselyt/' + id)
         .then(response => response.json())
         .then(data => {
             
@@ -39,19 +43,16 @@ function Kyselylist()
                     setTitle(data.title);
                     
                     questions[i] = data.kysymykset[i].kysymys;   
-                    
-                    document.getElementById("questions").innerHTML += 
-                    "<form>" +
+
+                   document.getElementById("questions").innerHTML += 
                         questions[i] + "</br>" +
-                        "<input type='text'/>";
+                        "<input type='text'/>" + "</br></br>";
                 }
                 document.getElementById("questions").innerHTML += 
-                "<button onClick=" + sendQuestions() + "> SEND </button>" +  
-                "</form>";
+                "<button onClick=" + sendAnswers() + "> SEND </button>";
             }
         })
         .catch(err => console.log(err))
-
     }
 
     return(
@@ -61,10 +62,10 @@ function Kyselylist()
             <form>
                 <input value={id} onChange={event => setId(event.target.value)}/>
             </form>
-
             <p>Title: {title}</p>
             <p>Kysymykset:</p>
-            <div id="questions"></div>      
+            
+            <div id="questions"></div>
         </div>
     );
 }

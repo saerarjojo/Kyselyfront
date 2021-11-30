@@ -11,7 +11,9 @@ function Kyselylist()
     var questions = [];
     var qSize = 0;
     
-    const [answers, setAnswers] = React.useState([]);
+    const [answersTab, setAnswersTab] = React.useState([]);
+
+    const [answers, setAnswers] = React.useState("");
 
     React.useEffect(() => {    
 
@@ -23,8 +25,34 @@ function Kyselylist()
     {
         console.log("-- sendAnswers");
 
-        console.log("answers: " + answers[0]);
+        console.log("question: " + questions[0]);
+        console.log("answers: " + answers);
+
+        alert("Vastaus: " + answers);
+
+        addAnswers(answers);
     }
+
+    // TODO TÄMÄ KESKEN!!!
+    function addAnswers(answer)
+    {
+        fetch('https://saerarjojo.herokuapp.com/rest/vastaukset/',{
+        method: 'POST',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify(answer)
+        })
+        .then(response => {
+            if(response.ok)
+            {
+                fetchQuestion();
+                alert("onnistui");
+            }
+            else
+                alert('Lisäys ei onnistunut');
+        })
+        .catch(err => console.log(err))
+    }
+    
 
     function fetchQuestion()
     {
@@ -44,12 +72,9 @@ function Kyselylist()
                     
                     questions[i] = data.kysymykset[i].kysymys;   
 
-                   document.getElementById("questions").innerHTML += 
-                        questions[i] + "</br>" +
-                        "<input type='text'/>" + "</br></br>";
+                    document.getElementById("questions").innerHTML += 
+                        questions[i] + "</br>";                        
                 }
-                document.getElementById("questions").innerHTML += 
-                "<button onClick=" + sendAnswers() + "> SEND </button>";
             }
         })
         .catch(err => console.log(err))
@@ -64,8 +89,11 @@ function Kyselylist()
             </form>
             <p>Title: {title}</p>
             <p>Kysymykset:</p>
-            
+
             <div id="questions"></div>
+            
+            <input value={answers} onChange={e => setAnswers(e.target.value)}/>
+            <button onClick={sendAnswers}>press</button>
         </div>
     );
 }

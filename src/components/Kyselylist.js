@@ -24,27 +24,30 @@ function Kyselylist()
             setQId(0);
             setFirst(false);
         }
-        
+
         fetchQuestion();
 
     }, )
 
     function sendAnswers()
     {
-        qIndex +=1;
+        qIndex ++;
+        console.log("1 -- -- qIndex: " + qIndex);
+
         setQId(qIndex);
+        console.log("2 -- -- qIndex: " + qIndex);
 
         console.log("-- sendAnswers: " + qId);
 
-        console.log("question: " + questions[0]);
+        console.log("question: " + questions[1]);
         console.log("answers: " + answers);
 
         //alert("Vastaus: " + answers);
 
-        addAnswers(answers, questions);
+        addAnswers(answers);
     }
 
-    function addAnswers(answer , question)
+    function addAnswers(answer)
     {
         console.log("-- addAnswers: " + qId);
 
@@ -52,8 +55,7 @@ function Kyselylist()
         {
             "vastaus": answer,
             "kysymys": {
-                "kysymysid": 4,
-                "kysymys": question[0],
+                "kysymysid": qId+1,
                 "kysely": {
                     "title": "Värit"
                 },
@@ -78,18 +80,23 @@ function Kyselylist()
                 alert('Lisäys ei onnistunut');
         })
         .catch(err => console.log(err))
+
+        setAnswers("");
+        fetchQuestion();
+        setDone(false);
     }
     
 
     function fetchQuestion()
     {
-        console.log("-- fetch 1 qId: " + qId);
+        console.log("1 -- qId: " + qId);
 
         fetch('https://saerarjojo.herokuapp.com/rest/kyselyt/' + id)
         .then(response => response.json())
         .then(data => {
-            
+
             qSize = data.kysymykset.length;
+
 
             if(!done)
             {   
@@ -103,15 +110,10 @@ function Kyselylist()
                 }
 
                 document.getElementById("questions").innerHTML = 
-                        questions[qId] + "</br>";
+                questions[qId] + "</br>";
 
-                console.log("-- fetch 2 qId: " + qId);
-
-                qIndex += 1;
-                setQId(qIndex);
+                console.log("2 -- qId: " + qId);
             }
-
-            console.log("-- fetch 3 qId: " + qId);
         })
         .catch(err => console.log(err))
     }
@@ -121,15 +123,15 @@ function Kyselylist()
             <h3>Kysely {id}</h3>
             
             <form>
-                <input value={id} onChange={event => setId(event.target.value)}/>
+                <input placeholder="Kyselyn id" value={id} onChange={event => setId(event.target.value)}/>
             </form>
-            <p>Title: {title}</p>
+            <p>Kysely: {title}</p>
             <p>Kysymykset:</p>
 
             <div id="questions"></div>
-            
-            <input value={answers} onChange={e => setAnswers(e.target.value)}/>
-            <button onClick={sendAnswers}>Next</button>
+
+            <input placeholder="Vastaus" value={answers} onChange={e => setAnswers(e.target.value)}/>
+            <button onClick={sendAnswers}>Seuraava</button>
         </div>
     );
 }

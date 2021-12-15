@@ -1,3 +1,4 @@
+import { getByDisplayValue } from '@testing-library/react';
 import React from 'react';
 
 function Kyselylist()
@@ -8,12 +9,13 @@ function Kyselylist()
 
     const [done, setDone] = React.useState(false);
 
+    const [noMore, setNoMore] = React.useState(false);
+
     const [first, setFirst] = React.useState(true);
 
     var questions = [];
     var qSize = 0;
     const [qId, setQId] = React.useState();
-    var qIndex = 0;
     
     const [answers, setAnswers] = React.useState("");
 
@@ -31,18 +33,19 @@ function Kyselylist()
 
     function sendAnswers()
     {
-        qIndex ++;
-        console.log("1 -- -- qIndex: " + qIndex);
-
-        setQId(qIndex);
-        console.log("2 -- -- qIndex: " + qIndex);
-
+        if(qId+1 < qSize)
+        {
+            setQId(qId + 1);
+            setNoMore(false);
+        }
+        else
+        {
+            setNoMore(true);
+        }
         console.log("-- sendAnswers: " + qId);
 
         console.log("question: " + questions[1]);
         console.log("answers: " + answers);
-
-        //alert("Vastaus: " + answers);
 
         addAnswers(answers);
     }
@@ -50,6 +53,7 @@ function Kyselylist()
     function addAnswers(answer)
     {
         console.log("-- addAnswers: " + qId);
+        console.log("ID: " + id);
 
         var vastaus = 
         {
@@ -57,13 +61,10 @@ function Kyselylist()
             "kysymys": {
                 "kysymysid": qId+1,
                 "kysely": {
-                    "title": "Värit"
-                },
-                "tyyppi": null
+                    "kyselyid": id
+                }
             }
         };
-
-        console.log(vastaus);
 
         fetch('https://saerarjojo.herokuapp.com/rest/vastaukset/',{
         method: 'POST',
@@ -106,12 +107,23 @@ function Kyselylist()
                 {
                     setTitle(data.title);
                     
-                    questions[i] = data.kysymykset[i].kysymys;   
+                    questions[i] = data.kysymykset[i].kysymysteksti;   
                 }
+                console.log("noMore: " + noMore);
 
-                document.getElementById("questions").innerHTML = 
-                questions[qId] + "</br>";
+                if(!noMore)
+                {
+                    document.getElementById("questions").innerHTML = 
+                    questions[qId] + "</br>";
+                }
+                else if(noMore)
+                {
+                    document.getElementById("questions").innerHTML = "Tässä kyselyssä ei ole enempää kysymyksiä" + "<br><br>" +
+                    "Kiitos paljon vastauksista!";
 
+                    document.getElementById("kentät").innerHTML = "";
+
+                }
                 console.log("2 -- qId: " + qId);
             }
         })
@@ -125,13 +137,15 @@ function Kyselylist()
             <form>
                 <input placeholder="Kyselyn id" value={id} onChange={event => setId(event.target.value)}/>
             </form>
-            <p>Kysely: {title}</p>
+            <p>Kyselyn otsikko: {title}</p>
             <p>Kysymykset:</p>
 
             <div id="questions"></div>
 
-            <input placeholder="Vastaus" value={answers} onChange={e => setAnswers(e.target.value)}/>
-            <button onClick={sendAnswers}>Seuraava</button>
+            <div id="kentät">
+                <input placeholder="Vastaus" value={answers} onChange={e => setAnswers(e.target.value)}/>
+                <button onClick={sendAnswers}>Seuraava</button>
+            </div>
         </div>
     );
 }
